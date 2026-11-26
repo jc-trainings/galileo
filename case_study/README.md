@@ -206,49 +206,11 @@ areas. Two things to tell participants:
 
 ```
 python case_study\level3_finetune.py --epochs 10 --lrs 1e-4
-python case_study\level3_finetune.py --out outputs\level3_full
-python case_study\level3_finetune.py --train_blocks 2 --out outputs\level3_blocks2
-python case_study\level3_finetune.py --train_blocks 0 --out outputs\level3_head
-python case_study\level3_finetune.py --n_labels 64 --out outputs\level3_64labels
+python case_study\level3_finetune.py --tif AREA
+
 ```
 
-- The first command is a quick check; the others are full runs (tens of minutes to a couple of hours on CPU).
-- **LP-FT (on by default):** fine-tuning starts from the Level 2 logistic regression ("linear probe,
-  then fine-tune"). This is more stable than starting from a random head, and it means Level 3 begins
-  exactly where Level 2 ended. Turn it off with `--lpft 0` to see the difference.
-- Validation uses 20% of the training points in whole ~5 km blocks. The best learning rate and epoch
-  are chosen on validation; **epoch 0 is the Level 2 starting point**, so if no epoch beats it the
-  script keeps it and says so. Fine-tuning then cannot end up worse than Level 2 on validation.
-- Level 2 and Level 3 each get a cut-off chosen on the same validation points, and are scored once on
-  the test areas.
-- `--train_blocks`: `-1` retrains all weights (default), `k` only the last k blocks, `0` only the head
-  (this should land close to Level 2).
-- `comparison.csv` compares Level 2 and Level 3 on the same test areas (AUC, F1, balanced accuracy);
-  `training_curves.png` shows whether fine-tuning learned or only memorised the training points.
-- `--tif AREA` also maps your area: `maize_probability_finetuned.tif` and `maize_class_finetuned.tif`.
 - Fine-tuning works on a copy: the original weights in `data\models\nano\` are never changed.
-
-**Reference results** (all weights, LP-FT, default settings; about 15 minutes on a laptop CPU). All
-three use the same 3,159 training points; the other 20% are held back for validation:
-
-| Model                                  | Test AUC, area 1 | Area 2 | Both areas | Balanced accuracy at cut-off |
-| -------------------------------------- | ---------------- | ------ | ---------- | ---------------------------- |
-| Level 2: Galileo + logistic regression | 0.86             | 0.56   | 0.80       | 0.70                         |
-| Level 2: Galileo + k-NN                | 0.87             | 0.75   | 0.84       | 0.70                         |
-| Level 3: fine-tuned Galileo            | 0.86             | 0.68   | 0.81       | 0.69                         |
-
-**What to look for:** fine-tuning improves on the linear model it started from (0.80 → 0.81 overall,
-and 0.56 → 0.68 in the harder area), so the model did learn something new about maize. It still does
-not beat k-NN on the frozen embeddings, which needs no training at all. This is the main lesson of
-the three levels: get Level 2 right before paying for Level 3. The best epoch was 8 of 15, and
-`training_curves.png` shows the training loss still falling after the validation score has levelled off.
-
-On the Busia map, the fine-tuned model agrees with WorldCereal exactly as well as Level 2's k-NN
-(AUC 0.71), but it is **overconfident**: almost every pixel is near 0 or 1, while the Level 2 map
-keeps smooth field-by-field detail (see `expected_outputs/level2_vs_level3_maps.png`). This is a
-typical sign of fine-tuning a million weights on a few thousand labels. Its cut-off chosen on
-validation is 0.01, so the yes/no map calls 74% of the tile maize. Compare the probability maps in
-QGIS rather than the yes/no maps.
 
 ## Notes
 
