@@ -28,7 +28,32 @@ exploring the landscape without any labels, then mapping maize with labels.
 
 You need: Windows, macOS or Linux; [Git](https://git-scm.com/downloads);
 [Miniforge](https://github.com/conda-forge/miniforge); [QGIS](https://qgis.org) to view maps; and a
-Google account with [Earth Engine](https://code.earthengine.google.com) access.
+Google account with Earth Engine access (step 1a below).
+
+### 1a. Get Earth Engine access
+
+Earth Engine is free for noncommercial use (research, education, non-profits), but every user needs
+a **Google Cloud project registered for Earth Engine**. It takes about 5 minutes and access is
+immediate. No billing account or payment details are needed for noncommercial use.
+
+1. Sign in to your Google account (a Gmail or work Google account).
+2. Open the registration page: https://code.earthengine.google.com/register
+3. Choose **Register a Noncommercial or Commercial Cloud project**.
+4. Choose **Unpaid usage**, then the project type that fits you (e.g. _Academia & Research_ or
+   _Training_). Fill in the short form: your organisation and a one-line description, for example
+   "Training workshop on geospatial foundation models".
+5. Choose **Create a new Google Cloud Project**. Give it a **Project ID**, e.g. `ee-yourname`.
+   The Project ID is lowercase, with no spaces, and must be unique. Write it down: this is your
+   `YOUR_PROJECT_ID` in the commands below. (It is the ID, not the display name.)
+6. Click **Continue to summary**, check the details and click **Confirm**.
+7. Check that it works: open https://code.earthengine.google.com. The Code Editor should load with
+   your project selected at the top right.
+
+Already have a Cloud project? On the same registration page you can register it instead of creating
+a new one. If you forget your Project ID, it is shown at the top right of the Code Editor and on
+https://console.cloud.google.com.
+
+### 1b. Install the case study
 
 On Windows, run every command in **Miniforge Prompt**.
 
@@ -41,13 +66,16 @@ conda activate galileo-gfm
 earthengine authenticate
 ```
 
-Run `conda activate galileo-gfm` in every new prompt. Check that Earth Engine works (it should print `1`):
+`earthengine authenticate` opens a browser: sign in with the **same Google account** you used in
+step 1a and allow access. Then run `conda activate galileo-gfm` in every new prompt. Check that
+Earth Engine works (it should print `1`):
 
 ```
 python -c "import ee; ee.Initialize(project='YOUR_PROJECT_ID'); print(ee.Number(1).getInfo())"
 ```
 
-Your Earth Engine Cloud project must be registered for Earth Engine.
+Replace `YOUR_PROJECT_ID` with the Project ID from step 1a (keep the quotes), e.g.
+`project='ee-yourname'`.
 
 ## 2. Export the study area (shared by all levels)
 
@@ -256,7 +284,9 @@ pip install torch==2.2.1 torchvision==0.17.1 --index-url https://download.pytorc
 | ------------------------------------- | --------------------------------------------------------------------------------------------------------- |
 | `conda` or `mamba` not recognized     | Use **Miniforge Prompt**, not a normal Command Prompt                                                     |
 | GDAL or rasterio DLL errors           | rasterio was reinstalled with pip. Run `conda env remove -n galileo-gfm` and create the environment again |
-| Earth Engine "project not registered" | Register the Cloud project for Earth Engine at code.earthengine.google.com                                |
+| Earth Engine "project not registered" | Register the project at https://code.earthengine.google.com/register (step 1a)                            |
+| Earth Engine "permission denied"      | Sign in to `earthengine authenticate` with the account that owns the project; check the Project ID        |
+| Browser does not open on authenticate | Run `earthengine authenticate --auth_mode=notebook` and follow the link it prints                         |
 | Export file not in Drive              | Check the task finished; search Drive for `min_lat=0.4611`                                                |
 | `need at least 12 timesteps`          | Export a full January–December year                                                                       |
 | CropHarvest download stops            | Run `python case_study\cropharvest_download.py` again; it resumes                                         |
