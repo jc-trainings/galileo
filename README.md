@@ -13,14 +13,14 @@ three levels of using a foundation model, from exploring the landscape to mappin
 
 ## Start here
 
-👉 **[case_study/README.md](case_study/README.md)**: setup, data export and the
+**[case_study/README.md](case_study/README.md)**: setup, data export and the
 step-by-step instructions for all three levels.
 
 Quick setup on Windows (in **Miniforge Prompt**):
 
 ```
-git clone https://github.com/jc-trainings/galileo-busia-case-study.git
-cd galileo-busia-case-study
+git clone https://github.com/jc-trainings/galileo.git
+cd galileo
 mamba env create -f environment.yml
 conda activate galileo-gfm
 ```
