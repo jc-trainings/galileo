@@ -235,6 +235,7 @@ areas. Two things to tell participants:
 ```
 python case_study\level3_finetune.py --epochs 10 --lrs 1e-4
 python case_study\level3_finetune.py --tif AREA
+python case_study\level3_finetune.py --map_only --tif AREA
 
 ```
 
